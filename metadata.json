@@ -1,0 +1,5 @@
+{
+  "name": "MeetingMind AI",
+  "description": "An intelligent meeting assistant that transcribes audio recordings, corrects transcripts, and generates structured meeting minutes using Gemini 2.5.",
+  "requestFramePermissions": []
+}
