@@ -6,7 +6,7 @@ import MinutesView from './components/MinutesView';
 import { fileToBase64 } from './utils/fileHelpers';
 import { transcribeAudio, correctTranscript, generateMeetingMinutes } from './services/geminiService';
 
-export const App: React.FC = () => {
+const App: React.FC = () => {
   const [step, setStep] = useState<AppStep>(AppStep.AUTH);
   const [processingState, setProcessingState] = useState<ProcessingState>({
     status: ProcessingStatus.IDLE,
@@ -287,3 +287,5 @@ export const App: React.FC = () => {
     </div>
   );
 };
+
+export default App;

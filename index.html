@@ -11,7 +11,6 @@
         font-family: 'Inter', sans-serif;
         background-color: #f3f4f6;
       }
-      /* Custom scrollbar for better aesthetics */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -30,10 +29,10 @@
   <script type="importmap">
 {
   "imports": {
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0"
   }
 }
@@ -41,5 +40,6 @@
 </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

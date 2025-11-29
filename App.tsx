@@ -26,7 +26,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const checkKey = async () => {
       if (window.aistudio) {
-        // IDZ/AI Studio Environment
+        // IDX/AI Studio Environment
         if (await window.aistudio.hasSelectedApiKey()) {
             setStep(AppStep.UPLOAD);
         } else {
@@ -226,7 +226,66 @@ const App: React.FC = () => {
                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                              </svg>
-                             Running Locally?
+                             API Key Missing
                          </h3>
-                         <p className="mb-3">To use this app on your own machine, you must configure the API Key via environment variables.</p>
-                         <ol className="list-decimal list-
+                         <p className="mb-3">To use this app, you must configure the API Key via environment variables.</p>
+                         <ol className="list-decimal list-inside space-y-1 ml-1">
+                           <li>Create a <code>.env</code> file in the project root.</li>
+                           <li>Add <code>API_KEY=your_gemini_key</code> inside it.</li>
+                           <li>Restart the application.</li>
+                         </ol>
+                         <div className="mt-4 pt-4 border-t border-yellow-200">
+                           <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="underline hover:text-yellow-900">
+                             Get a free Gemini API Key →
+                           </a>
+                         </div>
+                    </div>
+                 )}
+               </div>
+             </div>
+          )}
+
+          {/* Upload Step */}
+          {step === AppStep.UPLOAD && (
+            <div className="my-auto animate-fade-in">
+              <FileDropzone 
+                onFileSelect={handleFileSelect} 
+                disabled={processingState.status === ProcessingStatus.PROCESSING}
+              />
+            </div>
+          )}
+
+          {/* Transcript Step */}
+          {step === AppStep.TRANSCRIBE && (
+             <TranscriptView
+               transcript={data.transcript}
+               fileName={data.fileName}
+               onTranscriptChange={(newText) => setData(prev => ({ ...prev, transcript: newText }))}
+               onCorrectTranscript={handleCorrectTranscript}
+               onGenerateMinutes={handleGenerateMinutes}
+               processingState={processingState}
+             />
+          )}
+
+          {/* Minutes Step */}
+          {step === AppStep.MINUTES && (
+            <MinutesView
+              minutes={data.minutes}
+              fileName={data.fileName}
+              onBack={() => setStep(AppStep.TRANSCRIBE)}
+              onReset={resetApp}
+            />
+          )}
+
+        </div>
+      </main>
+      
+      {/* Footer */}
+      <footer className="py-6 border-t border-gray-200 text-center text-sm text-gray-500">
+        <p>© 2024 MeetingMind AI. Open Source under MIT License.</p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
