@@ -25,6 +25,9 @@ const App: React.FC = () => {
   // Check for existing API key on mount
   useEffect(() => {
     const checkKey = async () => {
+      // Debug logging for API Key detection
+      console.log("Checking API Key availability...");
+      
       if (window.aistudio) {
         // IDX/AI Studio Environment
         if (await window.aistudio.hasSelectedApiKey()) {
@@ -34,11 +37,13 @@ const App: React.FC = () => {
         }
       } else {
         // Local / Production Environment
-        // Check if API_KEY is injected via environment variables (e.g., .env file)
-        if (process.env.API_KEY) {
+        // Check various possible env locations
+        const hasKey = !!process.env.API_KEY || !!(import.meta as any).env?.VITE_API_KEY;
+        console.log("Has Local Key:", hasKey);
+        
+        if (hasKey) {
           setStep(AppStep.UPLOAD);
         } else {
-          // Stay on AUTH to show setup instructions
           setStep(AppStep.AUTH);
         }
       }
@@ -81,30 +86,24 @@ const App: React.FC = () => {
   const handleFileSelect = async (file: File) => {
     setAudioFile(file);
     setData(prev => ({ ...prev, fileName: file.name, fileType: file.type }));
-    setProcessingState({ status: ProcessingStatus.PROCESSING, message: 'Transcribing audio... (this may take a moment)' });
+    setProcessingState({ status: ProcessingStatus.PROCESSING, message: 'Transcribing audio... (Step 1/2)' });
     
     try {
       const base64Audio = await fileToBase64(file);
-      const transcript = await transcribeAudio(base64Audio, file.type);
       
-      setData(prev => ({ ...prev, transcript }));
+      // Step 1: Raw Transcription
+      const rawTranscript = await transcribeAudio(base64Audio, file.type);
+      
+      // Step 2: Auto-correction (Refinement)
+      setProcessingState({ status: ProcessingStatus.PROCESSING, message: 'Refining transcript with AI... (Step 2/2)' });
+      const refinedTranscript = await correctTranscript(rawTranscript);
+      
+      // Set final data
+      setData(prev => ({ ...prev, transcript: refinedTranscript }));
       setStep(AppStep.TRANSCRIBE);
-      setProcessingState({ status: ProcessingStatus.SUCCESS, message: 'Transcription complete' });
+      setProcessingState({ status: ProcessingStatus.SUCCESS, message: 'Processing complete' });
     } catch (error) {
-      handleError(error, 'Failed to transcribe audio.');
-    }
-  };
-
-  const handleCorrectTranscript = async () => {
-    if (!data.transcript) return;
-    
-    setProcessingState({ status: ProcessingStatus.PROCESSING, message: 'Correcting transcript with AI...' });
-    try {
-      const corrected = await correctTranscript(data.transcript);
-      setData(prev => ({ ...prev, transcript: corrected }));
-      setProcessingState({ status: ProcessingStatus.SUCCESS, message: 'Correction complete' });
-    } catch (error) {
-      handleError(error, 'Failed to correct transcript.');
+      handleError(error, 'Failed to process audio.');
     }
   };
 
@@ -261,7 +260,6 @@ const App: React.FC = () => {
                transcript={data.transcript}
                fileName={data.fileName}
                onTranscriptChange={(newText) => setData(prev => ({ ...prev, transcript: newText }))}
-               onCorrectTranscript={handleCorrectTranscript}
                onGenerateMinutes={handleGenerateMinutes}
                processingState={processingState}
              />

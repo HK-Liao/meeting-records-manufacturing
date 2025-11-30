@@ -5,7 +5,6 @@ interface TranscriptViewProps {
   transcript: string;
   fileName: string;
   onTranscriptChange: (newTranscript: string) => void;
-  onCorrectTranscript: () => void;
   onGenerateMinutes: () => void;
   processingState: ProcessingState;
 }
@@ -14,7 +13,6 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
   transcript,
   fileName,
   onTranscriptChange,
-  onCorrectTranscript,
   onGenerateMinutes,
   processingState,
 }) => {
@@ -35,7 +33,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
       <div className="p-4 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h2 className="text-lg font-semibold text-gray-800">Transcript Editor</h2>
-          <p className="text-sm text-gray-500">Edit raw text or use AI to correct it.</p>
+          <p className="text-sm text-gray-500">Review the auto-refined transcript.</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -51,16 +49,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12" />
             </svg>
           </button>
-          <button
-            onClick={onCorrectTranscript}
-            disabled={isProcessing}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clipRule="evenodd" />
-            </svg>
-            Auto-Correct
-          </button>
+          
           <button
             onClick={onGenerateMinutes}
             disabled={isProcessing}

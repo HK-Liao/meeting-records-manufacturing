@@ -3,9 +3,12 @@ import { GoogleGenAI } from "@google/genai";
 // Helper to get the AI instance with the current API Key
 // Prioritizes process.env.API_KEY as per guidelines
 const getAI = () => {
-  const apiKey = process.env.API_KEY;
+  // Try to get key from process.env (Node/Vite defines) or import.meta.env (Vite native)
+  const apiKey = process.env.API_KEY || (import.meta as any).env?.VITE_API_KEY;
+  
   if (!apiKey) {
-    throw new Error("API Key not found. Please ensure it is configured in the environment.");
+    console.error("API Key missing. Checked process.env.API_KEY and VITE_API_KEY.");
+    throw new Error("API Key not found. Please ensure it is configured in the environment (.env file).");
   }
   return new GoogleGenAI({ apiKey: apiKey });
 };
@@ -31,7 +34,12 @@ export const transcribeAudio = async (base64Audio: string, mimeType: string): Pr
             },
           },
           {
-            text: `Please provide a highly accurate, verbatim transcript of this audio file.
+            text: `Please provide a FULL, VERBATIM transcript of this audio file.
+            
+            **CRITICAL INSTRUCTIONS:**
+            1. **DO NOT SUMMARIZE.** Your goal is to transcribe every single word spoken.
+            2. **DO NOT CUT OFF.** Continue transcribing until the very end of the audio.
+            3. **Catch every utterance.** Even small interjections or short sentences.
             
             **Language Instructions:**
             - Detect the primary language of the audio.
@@ -41,8 +49,7 @@ export const transcribeAudio = async (base64Audio: string, mimeType: string): Pr
             
             **Formatting:**
             - Identify speakers if possible (e.g., Speaker 1, Speaker 2).
-            - Do not summarize yet; just transcribe what is said.
-            - If there is silence or noise, ignore it.`,
+            - Keep the structure linear and chronological.`,
           },
         ],
       },
@@ -66,11 +73,11 @@ export const correctTranscript = async (rawTranscript: string): Promise<string> 
       contents: `You are a professional editor. Please correct the following meeting transcript for grammar, punctuation, and clarity.
       
       **Important Constraints:**
+      - **Maintain the FULL CONTENT.** Do NOT summarize or delete any parts of the conversation.
       - Maintain the **original language** of the transcript.
       - If the text is in Chinese, ensure it uses **Traditional Chinese (Taiwan)**.
       - Fix typos and phonetic errors.
-      - Ensure the text flows naturally.
-      - **DO NOT** summarize or remove content. Keep the original meaning and speaker labels.
+      - Ensure the text flows naturally but keeps the speaker's original intent.
       
       Transcript to correct:
       ${rawTranscript}`,
