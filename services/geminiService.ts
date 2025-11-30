@@ -41,6 +41,11 @@ export const transcribeAudio = async (base64Audio: string, mimeType: string): Pr
             2. **DO NOT CUT OFF.** Continue transcribing until the very end of the audio.
             3. **Catch every utterance.** Even small interjections or short sentences.
             
+            **Noise & Silence Handling (IMPORTANT):**
+            1. **Ignore Silence/Noise:** If there is background noise, static, or silence at the end, **STOP TRANSCRIBING**. Do not output text for it.
+            2. **No Hallucinations:** Do NOT output repetitive phrases like "我不知道" (I don't know), "不客氣", or "..." unless they are clearly spoken by a person.
+            3. If the audio is just music or noise, output "[Non-speech audio]".
+
             **Formatting Rules (STRICTLY FOLLOW):**
             1. **Speaker Labels:** You MUST identify different speakers (e.g., "Speaker 1:", "Speaker 2:", or names if mentioned).
             2. **New Lines:** Every time a speaker changes or a new sentence starts, **START ON A NEW LINE**.
@@ -52,8 +57,9 @@ export const transcribeAudio = async (base64Audio: string, mimeType: string): Pr
             **Language Instructions:**
             - Detect the primary language of the audio.
             - If the language is **Mandarin/Chinese**, you MUST transcribe it in **Traditional Chinese (Taiwan usage)** (繁體中文).
-            - If the language is English, keep it in English.
-            - If the language is Japanese, keep it in Japanese.
+            - If the language is English, keep it in English and translate into **Traditional Chinese (Taiwan usage)** scripts.
+            - If the language is Japanese, keep it in Japanese and translate into **Traditional Chinese (Taiwan usage)** scripts.
+            - If the language is what you know, just translate into **Traditional Chinese (Taiwan usage)** scripts.
             `,
           },
         ],
@@ -82,6 +88,7 @@ export const correctTranscript = async (rawTranscript: string): Promise<string> 
       - Maintain the **original language** of the transcript.
       - If the text is in Chinese, ensure it uses **Traditional Chinese (Taiwan)**.
       - Fix typos and phonetic errors.
+      - **Remove Hallucinations:** If the transcript ends with repetitive phrases like "我不知道", "I don't know", "Silence", or gibberish that clearly doesn't fit the conversation context, DELETE THEM.
       
       **Formatting Constraints (CRITICAL):**
       1. **Preserve Speaker Labels:** Do NOT remove "Speaker 1:", "Speaker 2:", etc. If they are missing, try to infer them.
