@@ -41,15 +41,20 @@ export const transcribeAudio = async (base64Audio: string, mimeType: string): Pr
             2. **DO NOT CUT OFF.** Continue transcribing until the very end of the audio.
             3. **Catch every utterance.** Even small interjections or short sentences.
             
+            **Formatting Rules (STRICTLY FOLLOW):**
+            1. **Speaker Labels:** You MUST identify different speakers (e.g., "Speaker 1:", "Speaker 2:", or names if mentioned).
+            2. **New Lines:** Every time a speaker changes or a new sentence starts, **START ON A NEW LINE**.
+            3. **Structure Example:**
+               Speaker 1: Hello everyone.
+               Speaker 2: Hi, glad to be here.
+               Speaker 1: Let's start the meeting.
+            
             **Language Instructions:**
             - Detect the primary language of the audio.
             - If the language is **Mandarin/Chinese**, you MUST transcribe it in **Traditional Chinese (Taiwan usage)** (繁體中文).
             - If the language is English, keep it in English.
             - If the language is Japanese, keep it in Japanese.
-            
-            **Formatting:**
-            - Identify speakers if possible (e.g., Speaker 1, Speaker 2).
-            - Keep the structure linear and chronological.`,
+            `,
           },
         ],
       },
@@ -77,7 +82,13 @@ export const correctTranscript = async (rawTranscript: string): Promise<string> 
       - Maintain the **original language** of the transcript.
       - If the text is in Chinese, ensure it uses **Traditional Chinese (Taiwan)**.
       - Fix typos and phonetic errors.
-      - Ensure the text flows naturally but keeps the speaker's original intent.
+      
+      **Formatting Constraints (CRITICAL):**
+      1. **Preserve Speaker Labels:** Do NOT remove "Speaker 1:", "Speaker 2:", etc. If they are missing, try to infer them.
+      2. **Strict Line Breaks:** Ensure every speaker's turn starts on a new line. Do NOT merge them into paragraphs.
+      3. **Layout:**
+         Speaker A: [Content]
+         Speaker B: [Content]
       
       Transcript to correct:
       ${rawTranscript}`,
